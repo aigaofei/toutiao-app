@@ -4,6 +4,13 @@ import router from './router'
 import store from './store'
 import './styles/index.less'
 
+import Vant from 'vant'
+import 'vant/lib/index.css'
+
+// rem的单位适配转换
+import 'amfe-flexible'
+
+Vue.use(Vant)
 Vue.config.productionTip = false
 
 new Vue({
