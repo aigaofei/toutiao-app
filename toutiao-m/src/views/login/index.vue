@@ -3,20 +3,19 @@
     <van-nav-bar
       class='page-nav-bar'
       title="登录"
-      safe-area-inset-top='true'
     >
     <template #left>
       <van-icon name="cross" size="18" class='back'/>
       <span @click='$router.back()' >返回</span>
     </template>
     </van-nav-bar>
-    <van-form @submit="onSubmit" ref='sendCode'>
+    <van-form @submit="onSubmit" ref='sendCodes'>
       <van-field
         v-model="user.mobile"
         name="mobile"
         placeholder="请输入手机号"
-        type: Number
-        maxlength= '11'
+        type="number"
+        maxlength='11'
         :rules=mobileValidate
         class='loginField'
       >
@@ -26,21 +25,42 @@
         v-model="user.code"
         name="code"
         placeholder="请输入验证码"
-        type:Number
+        type='Number'
         maxlength= '6'
         :rules=codeValidate
         class='loginFont'
       >
       <span slot='left-icon' class='toutiao toutiaoyanzhengma'></span>
       <template #button>
-        <van-button v-if='flag' native-type='button' @click='onSendCode' class='yan' round size="small" type="default">发送验证码</van-button>
-        <van-count-down @finish= 'flag = true' v-else :time="time" format="ss 秒" />
+        <van-button v-if='flag'
+          native-type='button'
+          @click='onSendCode'
+          class='yan'
+          round
+          size="small"
+          type="default"
+        >
+        发送验证码
+        </van-button>
+        <van-count-down
+          @finish="flag=true"
+          v-else
+          :time="time"
+          format="ss 秒"
+        />
       </template>
       </van-field>
       <div class='sub'>
-        <van-button class='submit' block type="info" native-type="submit"><span class='subLog'>登录</span></van-button>
+        <van-button
+        class='submit'
+        block
+        type="info"
+        native-type="submit"
+        >
+        <span class='subLog'>登录</span></van-button>
       </div>
     </van-form>
+    <div class="buttomInfo">隐私声明</div>
   </div>
 </template>
 
@@ -81,61 +101,55 @@ export default {
   created () {},
   mounted () {},
   methods: {
-    // 2 表单验证
     async onSubmit () {
       this.$toast.loading({
         message: '加载中...',
         forbidClick: true
       })
-      // 1 获取表单数据
-      const user = this.user
-      // 3 提交表单内容
       try {
+        // 1 获取表单数据
+        const user = this.user
+        // 3 提交表单内容
+        // console.log(user)
         const { data: { data } } = await login(user)
         this.$toast.success('加载成功')
         // 登录成功的token码--全局存储在vuex容器里
         this.$store.commit('setUser', data)
         console.log(data)
+        this.$router.push('/layout')
       } catch (err) {
-        if (err.response.status === 400) {
-          // Toast.fail('加载失败，请再次尝试')
-          this.$toast.fail('加载失败，请再次尝试')
+        if (err.response.status === '507') {
+          console.log('服务器忙，请稍后重试')
+        } else if (err.response.status === 400) {
+          console.log('请求数据有误，请仔细检查')
         } else {
-          this.$toast.fail('服务器忙,请稍后重试')
+          console.log('未知错误，气死你')
+          this.$toast.fail('...错误啦...')
         }
       }
     },
-    // 4 根据反馈信息后续操作
     async onSendCode () {
-      // 1 校验手机号
-      console.log('发送验证码触发')
+      // const user = this.user
+      console.log('发送验证码')
       try {
-        await this.$refs.sendCode.validate('mobile')
-        this.$toast.success('通过')
-        this.backTime()
-      } catch (err) {
-        return this.$toast.fail('不对的加载---')
+        this.$refs.sendCodes.validate('mobile')
+      } catch (e) {
+        return this.$toast('验证码发送失败')
       }
-      // this.$refs.sendCode.resetValidation('code')
-      // 重置验证信息这个怎么用？？？？？？？？？？？？？？？？？？？
-      // console.log(this.$refs.sendCode.resetValidation('mobile'))
-      // console.log(this.mobileValidate[0].message = 'jose934')
-      // 2 发送请求，显示倒计时
-      // 3 收到响应
-    },
-    async backTime () {
       this.flag = false
       try {
         await sendCode(this.user.mobile)
-        this.$toast.success('验证码合适...')
+        this.$toast.success('手机号码已发送，请稍等...')
       } catch (err) {
-        this.flag = true
+        console.log('发送失败', err)
         if (err.response.status === 404) {
-          this.$toast.fail('手机号不正确')
+          this.$toast.fail('手机号码无效')
         } else if (err.response.status === 429) {
-          this.$toast.fail('访问次数太频繁，稍后再试')
+          this.$toast.fail('1分钟后才可以发送')
+        } else if (err.response.status === 507) {
+          this.$toast.fail('服务器数据库异常，稍后再试...')
         } else {
-          this.$toast.fail('其它错误，联系后端人员')
+          this.$toast.fail('未知错误...')
         }
       }
     }
@@ -165,9 +179,10 @@ export default {
       height: 48px;
       line-height: 48px;
       font-size: 28px;
-    }
-    .van-button__text {
-      color: #666666;
+      .van-button__text {
+        padding: 0;
+        color: #666666;
+      }
     }
     .loginField {
       line-height: 90px;
@@ -184,6 +199,13 @@ export default {
           color:#ffffff;
         }
       }
+    }
+    .buttomInfo {
+      position: relative;
+      bottom: -840px;
+      font-size: 24px;
+      transform: translateX(50%);
+      left: -46px;
     }
   }
 </style>

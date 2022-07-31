@@ -25,26 +25,26 @@ const routes = [
     path: '/layout',
     name: 'layoutIndex',
     component: layout,
+    redirect: '/layout/home',
     children: [
       {
         // 默认子路由只能有一个
         path: 'home', // 默认不写就是父级下默认的子级路由
-        redirect: '/home',
         name: 'homeIndex',
         component: home
       },
       {
-        path: '/qa',
+        path: 'qa',
         name: 'qaIndex',
         component: qa
       },
       {
-        path: '/video',
+        path: 'video',
         name: 'videoIndex',
         component: video
       },
       {
-        path: '/my',
+        path: 'my',
         name: 'myIndex',
         component: my
       }

@@ -3,19 +3,19 @@
     <router-view></router-view>
     <!-- 底部导航栏 -->
     <van-tabbar v-model="active" route>
-      <van-tabbar-item to='/home'>
+      <van-tabbar-item to='/layout/home'>
         <i slot='icon' class='toutiao toutiaoshouye'></i>
         <span>首页</span>
       </van-tabbar-item>
-      <van-tabbar-item to='/qa'>
+      <van-tabbar-item to='/layout/qa'>
         <i slot='icon' class='toutiao toutiaowenda1'></i>
         <span>问答</span>
       </van-tabbar-item>
-      <van-tabbar-item to='/video'>
+      <van-tabbar-item to='/layout/video'>
         <i slot='icon' class='toutiao toutiaoshipin1'></i>
         <span>视频</span>
       </van-tabbar-item>
-      <van-tabbar-item to='/my'>
+      <van-tabbar-item to='/layout/my'>
         <i slot='icon' class='toutiao toutiaowode1'></i>
         <span>我的</span>
       </van-tabbar-item>

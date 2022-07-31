@@ -1,17 +1,69 @@
 <template>
   <div class="my-container">
-    <div class="my-top-image" @click="$router.push('/login')">
+    <div v-if="$store.state.user" class="myLogin">
+      <div class="userTop">
+        <div class="userImage">
+          <van-image
+          round
+          fit="cover"
+          :src="require('@/images/cross1.jpg')"
+          class="userImg"
+          >
+            <template v-slot:loading>
+              <van-loading type="spinner" size="20" /> -->
+            </template>
+          </van-image>
+          <span class="userH">黑马头条</span>
+        </div>
+        <van-button class="userBut" type='default' round>编辑资料</van-button>
+      </div>
+      <div class="userBottom">
+        <div class="userInfo">
+          <span class="first">79</span>
+          <span>头条</span>
+        </div>
+        <div class="userInfo">
+          <span class="first">79</span>
+          <span>头条</span>
+        </div>
+        <div class="userInfo">
+          <span class="first">79</span>
+          <span>头条</span>
+        </div>
+        <div class="userInfo">
+          <span class="first">79</span>
+          <span>头条</span>
+        </div>
+      </div>
+    </div>
+    <div v-else class="my-top-image" @click="$router.push('/login')">
       <div class="phone-image"></div>
       <span>登录 / 注册</span>
     </div>
     <van-grid clickable :column-num="2">
-      <van-grid-item icon="home-o" text="路由跳转" to="/" />
-      <van-grid-item icon="search" text="URL 跳转" url="/vant/mobile.html" />
+      <van-grid-item
+      text="收 藏"
+      to="/"
+      class='textFont'
+      >
+        <span slot=icon class='toutiao toutiaoshoucang1'></span>
+      </van-grid-item>
+      <van-grid-item
+      text="历 史"
+      to="/layout/home"
+      class='textFont'
+      >
+        <span slot=icon class='toutiao toutiaolishi1'></span>
+      </van-grid-item>
     </van-grid>
+    <van-cell title="消息通知" is-link to="/layout/my" />
+    <van-cell title="小智同学" is-link to="/layout/my" />
+    <van-button v-if="$store.state.user" class="userButton" clickable type="default" size="large">退出登录</van-button>
   </div>
 </template>
 
 <script>
+// import { mapState } from "@/store"
 export default {
   name: 'myIndex',
   components: {},
@@ -20,7 +72,9 @@ export default {
     return {
     }
   },
-  computed: {},
+  computed: {
+    // ...mapState({'user'})
+  },
   watch: {},
   created () {},
   mounted () {},
@@ -34,7 +88,6 @@ export default {
       height: 361px;
       background-image: url(@/images/banner.png);
       background-size: cover;
-      overflow: hidden;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -48,9 +101,71 @@ export default {
       }
       span {
         color: #ffffff;
-        font-size: 22px;
+        font-size: 30px;
         margin-top: 18px;
       }
+    }
+    .myLogin {
+      height: 361px;
+      background-image: url(@/images/banner.png);
+      background-size: cover;
+      .userTop {
+        display: flex;
+        justify-content: space-between;
+        padding: 78px 32px;
+        align-items: center;
+        .userImage {
+          display:flex;
+          align-items: center;
+          .userH {
+            font-size: 34px;
+            color: #ffffff;
+            padding-left: 22px;
+          }
+          .userImg {
+            width: 140px;
+            height: 140px;
+          }
+        }
+        .userBut {
+          height: 38px;
+          .van-button__content {
+            padding-top: 2px;
+            .van-button__text {
+              font-size: 24px;
+            }
+          }
+        }
+      }
+      .userBottom {
+        display: flex;
+        justify-content: space-evenly;
+        position: relative;
+        top: -34px;
+        .userInfo {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          color: #ffffff;
+          font-size: 28px;
+          .first {
+            font-size: 38px;
+            margin-left: -2px;
+          }
+        }
+      }
+    }
+    .textFont {
+      font-size: 40px;
+      .toutiao {
+        font-size: 44px;
+      }
+      .van-grid-item__text {
+        padding-top: 8px;
+      }
+    }
+    .userButton {
+      color: #d86262;
     }
   }
 </style>
