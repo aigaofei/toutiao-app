@@ -1,7 +1,7 @@
 // 持久化本地存储的数据
 // 1 创建本地存储
 export const setItem = (item, data) => {
-  var dataInfo = ''
+  let dataInfo = ''
   if (typeof data === 'object') {
     dataInfo = JSON.stringify(data)
   }

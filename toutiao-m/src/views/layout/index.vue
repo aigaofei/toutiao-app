@@ -17,7 +17,8 @@
       </van-tabbar-item>
       <van-tabbar-item to='/layout/my'>
         <i slot='icon' class='toutiao toutiaowode1'></i>
-        <span>我的</span>
+        <span v-if="$store.state.user">我的</span>
+        <span v-else>未登录</span>
       </van-tabbar-item>
     </van-tabbar>
   </div>

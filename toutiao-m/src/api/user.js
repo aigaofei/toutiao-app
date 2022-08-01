@@ -17,3 +17,10 @@ export const sendCode = (params) => {
     method: 'GET'
   })
 }
+// 获取个人用户资料
+export const getSinglePersons = () => {
+  return axios({
+    method: 'GET',
+    url: '/v1_0/user/profile'
+  })
+}

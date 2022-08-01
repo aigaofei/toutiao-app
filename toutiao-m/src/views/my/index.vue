@@ -1,6 +1,6 @@
 <template>
   <div class="my-container">
-    <div v-if="$store.state.user" class="myLogin">
+    <div v-if="user" class="myLogin">
       <div class="userTop">
         <div class="userImage">
           <van-image
@@ -58,27 +58,64 @@
     </van-grid>
     <van-cell title="消息通知" is-link to="/layout/my" />
     <van-cell title="小智同学" is-link to="/layout/my" />
-    <van-button v-if="$store.state.user" class="userButton" clickable type="default" size="large">退出登录</van-button>
+    <van-button @click="userCancels" v-if="$store.state.user" class="userButton" clickable type="default" size="large">退出登录</van-button>
   </div>
 </template>
 
 <script>
-// import { mapState } from "@/store"
+import { mapState, mapMutations } from 'vuex'
+import { getSinglePersons } from '@/api/user.js'
 export default {
   name: 'myIndex',
   components: {},
   props: {},
   data () {
     return {
+      userSingleInfo: {}
     }
   },
   computed: {
-    // ...mapState({'user'})
+    ...mapState(['user'])
   },
   watch: {},
-  created () {},
+  created () {
+    if (this.user) {
+      this.getSingleP()
+    }
+  },
   mounted () {},
-  methods: {}
+  methods: {
+    ...mapMutations(['removeUser']),
+    userCancels () {
+      // this.$store.commit('removeUser', null)
+      this.$dialog.confirm({
+        title: '消息提示',
+        message: '您确认要退出'
+      })
+        .then(() => {
+          // on confirm
+          this.removeUser(null)
+          this.$toast.success('退出成功')
+        })
+        .catch(() => {
+          // on cancel
+          this.$toast.success('没有退出呢...')
+        })
+    },
+    async getSingleP () {
+      try {
+        const data = await getSinglePersons()
+        this.userSingleInfo = data
+      } catch (err) {
+        console.log('获取个人资料失败了', err)
+        if (err.response.status === 401) {
+          this.$toast.success('您的身份未认证，请去注册...')
+        } else {
+          this.$toast('用户信息错误--或者服务器出错')
+        }
+      }
+    }
+  }
 }
 </script>
 
