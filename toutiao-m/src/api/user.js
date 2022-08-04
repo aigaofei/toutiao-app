@@ -21,6 +21,13 @@ export const sendCode = (params) => {
 export const getSinglePersons = () => {
   return axios({
     method: 'GET',
-    url: '/v1_0/user/profile'
+    url: '/v1_0/user'
+  })
+}
+// 获取频道列表
+export const getUserChannels = () => {
+  return axios({
+    method: 'GET',
+    url: '/v1_0/user/channels'
   })
 }

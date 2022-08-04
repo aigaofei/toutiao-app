@@ -13,26 +13,26 @@
               <van-loading type="spinner" size="20" /> -->
             </template>
           </van-image>
-          <span class="userH">黑马头条</span>
+          <span class="userH">{{userSingleInfo.name}}</span>
         </div>
         <van-button class="userBut" type='default' round>编辑资料</van-button>
       </div>
       <div class="userBottom">
         <div class="userInfo">
-          <span class="first">79</span>
+          <span class="first">{{userSingleInfo.art_count}}</span>
           <span>头条</span>
         </div>
         <div class="userInfo">
-          <span class="first">79</span>
-          <span>头条</span>
+          <span class="first">{{userSingleInfo.fans_count}}</span>
+          <span>粉丝</span>
         </div>
         <div class="userInfo">
-          <span class="first">79</span>
-          <span>头条</span>
+          <span class="first">{{userSingleInfo.follow_count}}</span>
+          <span>关注</span>
         </div>
         <div class="userInfo">
-          <span class="first">79</span>
-          <span>头条</span>
+          <span class="first">{{userSingleInfo.like_count}}</span>
+          <span>获赞</span>
         </div>
       </div>
     </div>
@@ -105,7 +105,8 @@ export default {
     async getSingleP () {
       try {
         const data = await getSinglePersons()
-        this.userSingleInfo = data
+        this.userSingleInfo = data.data.data
+        console.log(this.userSingleInfo)
       } catch (err) {
         console.log('获取个人资料失败了', err)
         if (err.response.status === 401) {
@@ -119,7 +120,7 @@ export default {
 }
 </script>
 
-<style lang='less' scope>
+<style lang='less' scoped>
   .my-container {
     .my-top-image {
       height: 361px;
