@@ -13,25 +13,30 @@
         <van-tab title="" class="lastVanTab"> </van-tab>
       </van-tabs>
       <div class="lastSwiper">
-        <van-icon name="wap-nav" size="30" color="#333333e6" />
+        <van-icon @click="show=!show" name="wap-nav" size="30" color="#333333e6" />
       </div>
     </div>
+    <!-- 顶部汉堡菜单点击弹出层组件 -->
+    <homeChannelEdit :channelInfo='this.data_Channels' v-if='show' :isShow='show' @channel='channelEdit'></homeChannelEdit>
   </div>
 </template>
 
 <script>
 import { getUserChannels } from '@/api/user.js'
 import homeArticleList from '@/views/components/homeArticleList.vue'
+import homeChannelEdit from '@/views/components/homeChannelEdit.vue'
 export default {
   name: 'homeIndex',
   components: {
-    homeArticleList
+    homeArticleList,
+    homeChannelEdit
   },
   props: {},
   data () {
     return {
       active: 2,
-      data_Channels: {}
+      data_Channels: {},
+      show: false
     }
   },
   computed: {},
@@ -51,15 +56,16 @@ export default {
       } catch (err) {
         this.$toast('获取数据失败')
       }
+    },
+    channelEdit (data) {
+      console.log(data + '父组件收到的数据')
+      this.show = data
     }
   }
 }
 </script>
 
 <style lang='less' scoped>
-// .my-container {
-//   position: fixed;
-// }
  /deep/ .searchColor {
     position: sticky;
     top: 0;
@@ -95,10 +101,6 @@ export default {
         padding: 0px 52px;
         flex-shrink: 0.5;
       }
-      // &:last-child {
-      // }
-      // div:nth-of-type(2) {
-      // }
     }
     .van-tabs__nav {
       padding-right: 0;
