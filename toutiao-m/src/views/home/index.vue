@@ -5,8 +5,12 @@
     </van-nav-bar>
     <!-- 频道列表 -->
     <div class="outerSwiper">
-      <van-tabs class="tarBar">
-        <van-tab swipeable animated v-model="active" v-for="index in this.data_Channels" :key=index.id :title="index.name">
+      <van-tabs class="tarBar"
+      v-model="currentActive"
+      swipeable
+      animated
+      >
+        <van-tab v-for="index in this.data_Channels" :key=index.id :title="index.name" >
           <router-view></router-view>
           <homeArticleList :channel="index" ></homeArticleList>
         </van-tab>
@@ -17,7 +21,15 @@
       </div>
     </div>
     <!-- 顶部汉堡菜单点击弹出层组件 -->
-    <homeChannelEdit :channelInfo='this.data_Channels' v-if='show' :isShow='show' @channel='channelEdit'></homeChannelEdit>
+    <homeChannelEdit
+    :activeChannel='currentActive'
+    :channelInfo='this.data_Channels'
+    v-if='show' :isShow='show'
+    @channel='channelEdit'
+    @pushChannelButton="channelButton"
+    @singleMyChannel="myChannel"
+    >
+    </homeChannelEdit>
   </div>
 </template>
 
@@ -34,13 +46,18 @@ export default {
   props: {},
   data () {
     return {
-      active: 2,
-      data_Channels: {},
+      currentActive: 0,
+      data_Channels: [],
       show: false
     }
   },
   computed: {},
-  watch: {},
+  watch: {
+    data_Channels (newVal, oldVal) {
+      console.log(newVal)
+      console.log(oldVal)
+    }
+  },
   created () {
     this.loadChannels()
   },
@@ -60,6 +77,15 @@ export default {
     channelEdit (data) {
       console.log(data + '父组件收到的数据')
       this.show = data
+    },
+    myChannel (index) {
+      this.currentActive = Number.parseInt(index)
+    },
+    channelButton (data) {
+      // this.data_Channels = [...this.data_Channels, data]
+      console.log(data)
+      this.data_Channels.push(data)
+      console.log(1111111111)
     }
   }
 }

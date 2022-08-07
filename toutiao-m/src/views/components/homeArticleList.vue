@@ -90,7 +90,7 @@ export default {
         // 异步更新数据
         const { data: { data } } = await getArticles(this.articleParameter)
         // console.log(data.results)
-        console.log(data)
+        // console.log(data)
         const dataInfo = data.results
         // this.articleListInfo.push(...dataInfo)
         // 加载状态结束
@@ -104,7 +104,7 @@ export default {
         } else {
           // this.articleParameter.timestamp = data.pre_timestamp
           this.articleListInfo.push(...dataInfo)
-          console.log(dataInfo.length)
+          // console.log(dataInfo.length)
         }
       } catch (err) {
         // 加载状态结束

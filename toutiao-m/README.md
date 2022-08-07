@@ -45,4 +45,16 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 ##    <meta name="referrer" content="no-referrer">
 ##   【注意】：强防盗链时---此方法有时是不行的
 ## 12- 在子组件中如果申请获使用了【全局过滤器、全局指令】等类似工具，（提示： vue是可以在每个组件里都可导入并使用的）--【最后还要将此工具所在的组件--导入到 main.js 文件里】，这才完成了全局挂载的操作
-
+## 13- 子级和父级互相传值都是在【父级里的子级身上操作】--> [ <son :a='b' @c="d" ></son> ]   2:  【子级组件身上可以同时接收多个来自自己内部的---子向父传的事件绑定操作】--->[ <son @a="b" @c="d" @many="some"> ]   ====>  一定要注意这里
+## 14- 关于循环数组内部是多个对象的数组，要求是：A是全部内容
+##     B有A中的5个元素， C中要放A 中除B里-以外的内容进来，【B + C = A】这个意思， 
+### 14-1： 频道列表的案例
+###   第一种方法：  const boxC = []
+###    this.A.forEach(itemA => { 
+###    const box =  this.B.find( itemB => { return itemA.name === item.B } ) 
+###     if(!box) boxC.push(itemA) })
+###    box本身是找到的值为true的值，【取反】则为想要的结果
+### 14-2：
+###   第二种方法：
+###   const boxA = this.A.filter(itemA => { return !this.B.find( itemB => return itemB.name === itemA.name ) })
+###   这样就得到了结果----filter过滤的结果会自动保存在一个新数组里，本身也有遍历全部内容的功能，查找符合条件的结果

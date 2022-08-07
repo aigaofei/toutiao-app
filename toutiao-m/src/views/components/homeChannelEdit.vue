@@ -23,6 +23,8 @@
       type="default"
       v-for='(item, index) in channelInfo'
       :key=index
+      :class="[{activeColor:index===activeChannel}]"
+      @click="myChannelButton(index)"
       >
         <van-icon v-if='closeFlag' name="close" class='closeButton' />
         {{item.name}}
@@ -40,39 +42,119 @@
       <span>频道推荐</span>
     </div>
     <div class="channelButton">
-      <van-button icon="plus" class='single singleButtonMargin' size="normal" type="default">大数据</van-button>
-      <van-button icon="plus" class='single singleButtonMargin' size="normal" type="default">前端</van-button>
+      <van-button icon="plus"
+      class='single singleButtonMargin'
+      size="normal" type="default"
+      v-for='item in allChannelInfoContent' :key='item.id'
+      @click="pushChannel(item)"
+      >
+      {{item.name}}
+      </van-button>
+      <!-- <van-button icon="plus" class='single singleButtonMargin' size="normal" type="default">前端</van-button>
       <van-button icon="plus" class='single singleButtonMargin' size="normal" type="default">JAVA</van-button>
       <van-button icon="plus" class='single singleButtonMargin' size="normal" type="default">HTML</van-button>
-      <van-button icon="plus" class='single singleButtonMargin' size="normal" type="default">区块链</van-button>
+      <van-button icon="plus" class='single singleButtonMargin' size="normal" type="default">区块链</van-button> -->
     </div>
     </van-popup>
   </div>
 </template>
 
 <script>
+import { allChannelContent } from '@/api/channel.js'
 export default {
   name: 'homeChannelEdit',
   components: {},
-  props: ['isShow', 'channelInfo'],
-  watch: {},
-  computed: {},
+  // props: ['isShow', 'activeChannel', 'channelInfo'],
+  props: {
+    isShow: {
+      require: true
+    },
+    activeChannel: {
+      require: true,
+      type: Number
+    },
+    channelInfo: {
+      require: true,
+      type: Array
+    }
+  },
   data () {
     return {
       show: this.isShow,
-      closeFlag: false
+      closeFlag: false,
+      allChannelData: []
+    }
+  },
+  watch: {},
+  computed: {
+    allChannelInfoContent () {
+    // 创建一个新的频道数组
+    // const allChannel = []
+    // console.log(this.channelInfo)
+    // 查找符合条件的内容
+    // 这种连续循环只能用递归方法
+    // this.allChannelData.forEach(item => {
+    //   this.channelInfo.forEach(dataItem => {
+    //     if (item.name !== dataItem.name) {
+    //       allChannel.forEach(itemInfo => {
+    //         if (itemInfo.name.indexOf(item.name) === -1) {
+    //           allChannel.push(item)
+    //         }
+    //       })
+    //     }
+    //   })
+    // })
+      const allChannel = []
+      this.allChannelData.forEach(item => {
+        const dataInfo = this.channelInfo.find(info => {
+          return item.name === info.name
+        })
+        // console.log(dataInfo)
+        if (!dataInfo) {
+          allChannel.push(item)
+        }
+      })
+      // console.log(allChannel)
+      return allChannel
     }
   },
   created () {
     console.log(this.isShow + '子组件里的props数据')
+    console.log(this.activeChannel)
+    this.loadAllChannel()
   },
   mounted () {},
   methods: {
     showPopup () {
       this.show = false
       this.$emit('channel', this.show)
+    },
+    myChannelButton (index) {
+      this.$emit('singleMyChannel', index)
+      console.log(index)
+      this.showPopup()
+    },
+    async loadAllChannel () {
+      try {
+        const { data: { data } } = await allChannelContent()
+        // console.log(data.channels)
+        this.allChannelData = data.channels
+      } catch (err) {
+        this.$toast('所有频道内容获取失败')
+      }
+    },
+    pushChannel (data) {
+      // this.channelInfo.push(data)
+      // this.allChannelData.forEach((item, index) => {
+      //   if (item.name === data.name) {
+      //     this.allChannelData.splice(index, 1)
+      //   }
+      // })
+      console.log(data.name)
+      console.log(this.allChannelData)
+      this.$emit('pushChannelButton', data)
+      console.log(data)
     }
-
   }
 }
 </script>
@@ -139,6 +221,9 @@ export default {
         padding: 0px 19px !important;
         height: 20px;
       }
+    }
+    .activeColor {
+      color: red;
     }
   }
 </style>
