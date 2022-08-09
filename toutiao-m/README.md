@@ -58,3 +58,4 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 ###   第二种方法：
 ###   const boxA = this.A.filter(itemA => { return !this.B.find( itemB => return itemB.name === itemA.name ) })
 ###   这样就得到了结果----filter过滤的结果会自动保存在一个新数组里，本身也有遍历全部内容的功能，查找符合条件的结果
+##  15- 计算属性computed 是动态响应式的---是可以缓存的

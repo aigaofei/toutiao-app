@@ -28,15 +28,20 @@
     @channel='channelEdit'
     @pushChannelButton="channelButton"
     @singleMyChannel="myChannel"
+    @deleteMyChannel="deleteChannel"
+    @currentActive="currentChannel"
+    @deleteChannelButton="deleteButton"
     >
     </homeChannelEdit>
   </div>
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import { getUserChannels } from '@/api/user.js'
 import homeArticleList from '@/views/components/homeArticleList.vue'
 import homeChannelEdit from '@/views/components/homeChannelEdit.vue'
+import { getItem, setItem } from '@/utils/localStorage.js'
 export default {
   name: 'homeIndex',
   components: {
@@ -47,11 +52,13 @@ export default {
   data () {
     return {
       currentActive: 0,
-      data_Channels: [],
+      data_Channels: getItem('myChannelInfo'),
       show: false
     }
   },
-  computed: {},
+  computed: {
+    ...mapState(['user'])
+  },
   watch: {
     data_Channels (newVal, oldVal) {
       console.log(newVal)
@@ -68,7 +75,9 @@ export default {
       try {
         const dataChannels = await getUserChannels()
         console.log(dataChannels)
-        this.data_Channels = dataChannels.data.data.channels
+        this.data_Channels = getItem('myChannelInfo')
+        // 存储到本地持久化了
+        setItem('myChannelInfo', dataChannels.data.data.channels)
         console.log(this.data_Channels)
       } catch (err) {
         this.$toast('获取数据失败')
@@ -81,11 +90,31 @@ export default {
     myChannel (index) {
       this.currentActive = Number.parseInt(index)
     },
+    // 下面是未登录时--新增用户频道-本地持久化的操作
     channelButton (data) {
       // this.data_Channels = [...this.data_Channels, data]
       console.log(data)
       this.data_Channels.push(data)
-      console.log(1111111111)
+      // 同时将新增的频道添加到本地持久存储里
+      setItem('myChannelInfo', this.data_Channels)
+      console.log(1111111 + '------这里是未登录时用户新增的频道按钮')
+    },
+    // 下面是登录时，用户删除后请求发送
+    deleteButton () {
+      console.log(this.data_Channels)
+      if (this.user) {
+        // this.data_Channels.push(data)
+        console.log(this.data_Channels)
+        setItem('myChannelInfo', this.data_Channels)
+        return false
+      }
+    },
+    deleteChannel (index) {
+      this.data_Channels.splice(index, 1)
+      setItem('myChannelInfo', this.data_Channels)
+    },
+    currentChannel (index) {
+      this.currentActive -= 1
     }
   }
 }
@@ -119,7 +148,6 @@ export default {
     .van-tab {
       border-right: 1px solid #f0f0f0;
       border-bottom: 1px solid #d7d6d6;
-      padding: 0 40px;
       .van-tab__text {
         color: #c1c3c3;
       }

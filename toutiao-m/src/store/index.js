@@ -7,10 +7,7 @@ Vue.use(Vuex)
 const userCode = 'TOUTIAO_USER'
 export default new Vuex.Store({
   state: {
-    user: getItem(userCode),
-    allChannel: [],
-    abc: [],
-    singleUserChannels: []
+    user: getItem(userCode)
   },
   getters: {
   },
@@ -22,15 +19,6 @@ export default new Vuex.Store({
     removeUser (state, data) {
       state.user = data
       removeItem(userCode)
-    },
-    getAllChannel (state, data) {
-      state.allChannel = data
-    },
-    addAllChannel (state, data) {
-      state.abc.push(data)
-    },
-    userChannel (state, data) {
-      state.singleUserChannels = data
     }
   },
   actions: {

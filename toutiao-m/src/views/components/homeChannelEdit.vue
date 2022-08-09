@@ -14,7 +14,9 @@
     >
     <div class='myChannelContent'>
       <span>我的频道列表</span>
-      <van-button @click='closeFlag=!closeFlag' size="small" round type="info" class='edit'>编 辑</van-button>
+      <van-button @click='toggleButton'
+      size="small" round type="info"
+      class='edit'>{{closeFlag === true ? '完 成' : '编 辑'}}</van-button>
     </div>
     <div class="myChannelButton">
       <van-button
@@ -26,7 +28,7 @@
       :class="[{activeColor:index===activeChannel}]"
       @click="myChannelButton(index)"
       >
-        <van-icon v-if='closeFlag' name="close" class='closeButton' />
+        <van-icon v-if='closeFlag && index !==0' name="close" class='closeButton' />
         {{item.name}}
       </van-button>
       <!-- <van-button class='single mySingleButtonMargin' size="normal" type="default">
@@ -45,7 +47,7 @@
       <van-button icon="plus"
       class='single singleButtonMargin'
       size="normal" type="default"
-      v-for='item in allChannelInfoContent' :key='item.id'
+      v-for="(item) in allChannelInfoContent" :key='item.id'
       @click="pushChannel(item)"
       >
       {{item.name}}
@@ -60,7 +62,9 @@
 </template>
 
 <script>
-import { allChannelContent } from '@/api/channel.js'
+import { allChannelContent, postChannelContent, postDeleteChannelContent } from '@/api/channel.js'
+import { mapState } from 'vuex'
+import { getItem } from '@/utils/localStorage.js'
 export default {
   name: 'homeChannelEdit',
   components: {},
@@ -82,7 +86,8 @@ export default {
     return {
       show: this.isShow,
       closeFlag: false,
-      allChannelData: []
+      allChannelData: [],
+      putChannel: []
     }
   },
   watch: {},
@@ -116,12 +121,14 @@ export default {
       })
       // console.log(allChannel)
       return allChannel
-    }
+    },
+    ...mapState(['user'])
   },
   created () {
     console.log(this.isShow + '子组件里的props数据')
     console.log(this.activeChannel)
     this.loadAllChannel()
+    console.log(this.user)
   },
   mounted () {},
   methods: {
@@ -130,9 +137,20 @@ export default {
       this.$emit('channel', this.show)
     },
     myChannelButton (index) {
-      this.$emit('singleMyChannel', index)
-      console.log(index)
-      this.showPopup()
+      if (this.closeFlag === false) {
+        this.$emit('singleMyChannel', index)
+        this.showPopup()
+        console.log(index)
+        return false
+      }
+      if (index === 0) {
+        return false
+      }
+      if (index <= this.activeChannel) {
+        this.$emit('currentActive', -1)
+      }
+      this.$emit('deleteMyChannel', index)
+      console.log(index + '-----要删除的频道按钮索引')
     },
     async loadAllChannel () {
       try {
@@ -143,17 +161,110 @@ export default {
         this.$toast('所有频道内容获取失败')
       }
     },
-    pushChannel (data) {
+    async pushChannel (channelData) {
       // this.channelInfo.push(data)
       // this.allChannelData.forEach((item, index) => {
       //   if (item.name === data.name) {
       //     this.allChannelData.splice(index, 1)
       //   }
       // })
-      console.log(data.name)
-      console.log(this.allChannelData)
-      this.$emit('pushChannelButton', data)
-      console.log(data)
+      console.log(channelData.id)
+      // 下面是获取所有频道内容
+      // console.log(this.allChannelData)
+      if (this.user) {
+        console.log(this.channelInfo.length + '登录后随时添加的总频道数')
+        try {
+          const { data: { data } } = await postChannelContent({
+            id: channelData.id,
+            seq: this.channelInfo.length
+          })
+          console.log(data.channels[0])
+          console.log(this.channelInfo.length)
+          console.log(this.channelInfo)
+          console.log('请求数据成功----')
+          // 将返回来的数据存到自己本地里--返回的数据时添加目标的id和顺序
+          this.$emit('pushChannelButton', channelData)
+        } catch (err) {
+          this.$toast('获取频道数据失败，心情不好....')
+        }
+        return false
+      }
+      // 下面这行是将它交给父级组件，未登陆时可在本地持久化
+      this.$emit('pushChannelButton', channelData)
+    },
+    // 做的是登录时--我的频道里面删除的内容后--发送的请求
+    async toggleButton () {
+      this.closeFlag = !this.closeFlag
+      console.log(this.closeFlag)
+      // 下面是登陆后---操作删除频道后保存到数据库的提交
+      if (this.user) {
+        console.log(this.channelInfo.length)
+        if (!this.closeFlag) {
+          const deleteAllChannel = getItem('myChannelInfo')
+          console.log(deleteAllChannel)
+          const submitChannels = []
+          deleteAllChannel.forEach((item, index) => {
+            submitChannels.push({
+              id: item.id,
+              seq: index
+            })
+          })
+          // 查看删除后剩下的频道参数
+          console.log(submitChannels)
+          try {
+            // 第一种方法是在编辑按钮为false时删除目标频道
+            const { data: { data } } = await postDeleteChannelContent(submitChannels)
+            console.log(data.channels[0])
+            console.log(this.channelInfo.length)
+            console.log(this.channelInfo)
+            console.log('请求数据成功----')
+            // 第二种是在编辑按钮为false时，提交剩下频道按钮
+            // const { data: { data } } = await postChannelContent(submitChannels)
+            // console.log(data.channels[0])
+            // console.log(this.channelInfo.length)
+            // console.log(this.channelInfo)
+            // console.log('请求数据成功----')
+            // 将返回来的数据存到自己本地里--返回的数据时添加目标的id和顺序
+            this.$emit('deleteChannelButton')
+            // 第三种方法是--在编辑按钮为false时，先全部删除，再将剩下的全部提交
+            // 由于是接口问题--上面表面是将所剩的内容提交，实际
+            // 是将我的列表初始清空了，只剩推荐一个频道
+            // 所以下面用除了推荐频道，将剩下的频道再提交一般的迂回做法完成
+            // 再获取一次本地持久存储的数据，排掉第一个，留下剩余
+            const deleteAllChannel = getItem('myChannelInfo')
+            console.log(deleteAllChannel)
+            console.log('上面是目前本地持久的--频道数据')
+            deleteAllChannel.splice(0, 1)
+            const submitChannel = []
+            deleteAllChannel.forEach((item) => {
+              submitChannel.push({
+                id: item.id,
+                seq: deleteAllChannel.length
+              })
+            })
+            console.log(submitChannel)
+            // 循环一次提交一次
+            // 这里千万不能直接调用，因为外表相同--内部逻辑不通
+            // this.pushChannel(submitChannel)
+            submitChannel.forEach(async item => {
+              await postChannelContent(item)
+              this.$emit('deleteChannelButton')
+            })
+            // 查看删除后剩下的频道参数
+            console.log(submitChannel)
+            // // 重新再提交一遍--除--第一项的其它数据
+            // // 这里调用的是提交添加按钮的方法
+            // const { data: { data: data1 } } = await postChannelContent(submitChannel)
+            // console.log(data1.channels[0])
+            // console.log(this.channelInfo.length)
+            // console.log(this.channelInfo)
+            // this.$emit('deleteChannelButton')
+          } catch (err) {
+            this.$toast('获取频道数据失败，心情不好....')
+          }
+          return false
+        }
+      }
     }
   }
 }
