@@ -11,7 +11,11 @@
       >
         <van-cell v-for="(item, index) in articleListInfo"
         :key="index"
+        is-link
+        @click="toThisArticle(item.art_id)"
         >
+        <!-- 下面是第二种路由跳转 -->
+        <!-- :to="'/articleInfo/' + item.art_id" -->
         <!-- <template slot='title'  -->
         <div class="articleContentMany" v-if='item.cover.type === 3'>
           <div class="articleTitle articleTitleMany">{{item.title}}</div>
@@ -89,7 +93,7 @@ export default {
       try {
         // 异步更新数据
         const { data: { data } } = await getArticles(this.articleParameter)
-        // console.log(data.results)
+        console.log(data.results)
         // console.log(data)
         const dataInfo = data.results
         // this.articleListInfo.push(...dataInfo)
@@ -127,6 +131,9 @@ export default {
       } catch (err) {
         this.successInfo = '无网络，尝试重刷新...'
       }
+    },
+    toThisArticle (id) {
+      this.$router.push(`/articleInfo/${id}`)
     }
   }
 }

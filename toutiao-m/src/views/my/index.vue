@@ -15,7 +15,7 @@
           </van-image>
           <span class="userH">{{userSingleInfo.name}}</span>
         </div>
-        <van-button class="userBut" type='default' round>编辑资料</van-button>
+        <van-button to="/layout/my/editMyInfo" class="userBut" type='default' round>编辑资料</van-button>
       </div>
       <div class="userBottom">
         <div class="userInfo">

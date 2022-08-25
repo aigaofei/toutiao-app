@@ -8,6 +8,8 @@ import my from '@/views/my'
 import video from '@/views/video'
 import home from '@/views/home'
 import search from '@/views/components/search'
+import articleInfo from '@/views/components/articleInfo'
+import editMyInfo from '@/views/my/editMyInfo'
 Vue.use(VueRouter)
 
 const routes = [
@@ -21,7 +23,7 @@ const routes = [
     name: 'login',
     component: login
   },
-  // 首页路由
+  // 分页功能路由
   {
     path: '/layout',
     name: 'layoutIndex',
@@ -55,6 +57,17 @@ const routes = [
     path: '/search',
     name: 'search',
     component: search
+  },
+  {
+    path: '/articleInfo/:id', // 动态路由
+    name: 'articleInfo',
+    component: articleInfo,
+    props: true // 在此组件里props直接使用对应的参数id
+  },
+  {
+    name: 'editMyInfo',
+    path: '/layout/my/editMyInfo',
+    component: editMyInfo
   }
 ]
 
