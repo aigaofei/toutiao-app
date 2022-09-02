@@ -1,5 +1,6 @@
 # toutiao-m
 ## Project setup
+[![OSCS Status](https://www.oscs1024.com/platform/badge/aigaofei/toutiao-app.svg?size=small)](https://www.oscs1024.com/project/aigaofei/toutiao-app?ref=badge_small)
 ```
 npm install
 ```
